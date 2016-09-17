@@ -12,21 +12,23 @@ import (
 )
 
 type Conf struct {
-	Actions []Action `json:"actions"`
+	AllowIpAddresses []string `json:"allow_ip_addresses"`
+	Actions          []Action `json:"actions"`
 }
 type Action struct {
-	Title       string `json:"title"`
+	Id          string `json:"id"`
 	Path        string `json:"path"`
 	Description string `json:"description"`
 }
 
 //InitConf makes config folder,sample config file,sample script.
 func InitConf(path string) (err error) {
-	//directory
+	//make directory
 	if err := os.MkdirAll(path, 0777); err != nil {
 		return fmt.Errorf("make directory: %v", err)
 	}
-	//json
+
+	//make json
 	Confjson, err := os.Create(filepath.Join(path, "pochtona.json"))
 	if err != nil {
 		return fmt.Errorf("make conf: %v", err)
@@ -37,7 +39,7 @@ func InitConf(path string) (err error) {
 		return fmt.Errorf("write conf: %v", err)
 	}
 
-	//sctript
+	//make sctript
 	hello := ""
 	if runtime.GOOS != "windows" {
 		hello = "hello.sh"
@@ -59,13 +61,15 @@ func InitConf(path string) (err error) {
 
 //GetSampleConf writes sample config
 func GetSampleConf(out io.Writer, path string) error {
-	sampleConf := Conf{Actions: []Action{
-		Action{
-			Title:       "hello",
-			Path:        filepath.Join(path, "hello.sh"),
-			Description: "echo hello",
-		},
-	}}
+	sampleConf := Conf{
+		AllowIpAddresses: []string{"*.*.*.*"},
+		Actions: []Action{
+			Action{
+				Id:          "hello",
+				Path:        filepath.Join(path, "hello.sh"),
+				Description: "echo hello",
+			},
+		}}
 	bytes, err := json.MarshalIndent(sampleConf, "", "    ")
 	if err != nil {
 		return fmt.Errorf("decode conf: %v", err)
