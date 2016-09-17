@@ -2,9 +2,17 @@
 package main
 
 import (
-	"os"
+	"fmt"
+	"path/filepath"
 )
 
 func main() {
-	GetSampleConf(os.Stdout)
+	current, err := filepath.Abs("./_test")
+	if err != nil {
+		print(err)
+	}
+	err = InitConf(current)
+	if err != nil {
+		fmt.Println(err)
+	}
 }
