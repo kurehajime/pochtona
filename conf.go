@@ -13,6 +13,7 @@ import (
 
 type Conf struct {
 	AllowIpAddresses []string `json:"allow_ip_addresses"`
+	Port             int      `json:"port"`
 	Actions          []Action `json:"actions"`
 }
 type Action struct {
@@ -29,14 +30,19 @@ func InitConf(path string) (err error) {
 	}
 
 	//make json
-	Confjson, err := os.Create(filepath.Join(path, "pochtona.json"))
-	if err != nil {
-		return fmt.Errorf("make conf: %v", err)
+	makeJson := func() error {
+		Confjson, err := os.Create(filepath.Join(path, "pochtona.json"))
+		if err != nil {
+			return fmt.Errorf("make conf: %v", err)
+		}
+		defer Confjson.Close()
+		if err = GetSampleConf(Confjson, path); err != nil {
+			return fmt.Errorf("write conf: %v", err)
+		}
+		return nil
 	}
-	defer Confjson.Close()
-	err = GetSampleConf(Confjson, path)
-	if err != nil {
-		return fmt.Errorf("write conf: %v", err)
+	if err = makeJson(); err != nil {
+		return err
 	}
 
 	//make sctript
@@ -46,16 +52,24 @@ func InitConf(path string) (err error) {
 	} else {
 		hello = "hello.bat"
 	}
-	HelloSh, err := os.Create(filepath.Join(path, hello))
-	if err != nil {
-		return fmt.Errorf("make hello: %v", err)
+	makeHello := func() error {
+		HelloSh, err := os.Create(filepath.Join(path, hello))
+		if err != nil {
+			return fmt.Errorf("make hello: %v", err)
+		}
+		defer HelloSh.Close()
+		_, err = HelloSh.WriteString("echo hello")
+		if err != nil {
+			return fmt.Errorf("write hello: %v", err)
+		}
+		return nil
 	}
-	defer HelloSh.Close()
-	_, err = HelloSh.WriteString("echo hello")
-	if err != nil {
-		return fmt.Errorf("write hello: %v", err)
+	if err = makeHello(); err != nil {
+		return err
 	}
-
+	if err = os.Chmod(filepath.Join(path, hello), 0777); err != nil {
+		return fmt.Errorf("chmod hello: %v", err)
+	}
 	return nil
 }
 
@@ -63,6 +77,7 @@ func InitConf(path string) (err error) {
 func GetSampleConf(out io.Writer, path string) error {
 	sampleConf := Conf{
 		AllowIpAddresses: []string{"*.*.*.*"},
+		Port:             8080,
 		Actions: []Action{
 			Action{
 				Id:          "hello",

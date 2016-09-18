@@ -5,37 +5,54 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"os/exec"
+	"runtime"
 	"strconv"
 )
 
-type ServerConf struct {
-	Port   int
-	Config Conf
-}
-
-func Start(sc ServerConf) {
+func Start(c Conf) {
 	//start server
-	url := "http://localhost" + ":" + strconv.Itoa(sc.Port)
-	fmt.Println(url)
+	url := "http://localhost" + ":" + strconv.Itoa(c.Port)
 	fmt.Println("Stop: Ctrl+C")
 	//Handle
 	http.HandleFunc("/", index)
-	for _, a := range sc.Config.Actions {
+	fmt.Println("Top page:\n\t" + url)
+	for _, a := range c.Actions {
+		fmt.Println(a.Id + ":\n\t" + url + "/" + a.Id)
 		http.HandleFunc("/"+a.Id, func(w http.ResponseWriter, r *http.Request) {
 			action(w, r, a)
 		})
 	}
 	//listen
-	err := http.ListenAndServe(":"+strconv.Itoa(sc.Port), nil)
+	err := http.ListenAndServe(":"+strconv.Itoa(c.Port), nil)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
 	}
 }
-func index(w http.ResponseWriter, r *http.Request) {
 
+func index(w http.ResponseWriter, r *http.Request) {
+	fmt.Fprint(w, "ふぇぇ")
 }
 
 func action(w http.ResponseWriter, r *http.Request, a Action) {
+	fmt.Fprint(w, cmd(a.Path))
+}
 
+//exec command
+func cmd(commandString string) string {
+	var command string
+	var op string
+	if runtime.GOOS == "windows" {
+		command = "cmd"
+		op = "/c"
+	} else {
+		command = "/bin/sh"
+		op = "-c"
+	}
+	out, err := exec.Command(command, op, commandString).Output()
+	if err != nil {
+		return string(err.Error())
+	}
+	return string(out)
 }
