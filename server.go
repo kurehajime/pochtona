@@ -13,6 +13,7 @@ import (
 
 var conf Conf
 
+//start http server
 func Start(c Conf) {
 	conf = c
 	//start server
@@ -35,6 +36,7 @@ func Start(c Conf) {
 	}
 }
 
+//index page
 func index(w http.ResponseWriter, r *http.Request) {
 	t := template.New("index")
 	t, err := t.Parse(templete_index)
@@ -45,6 +47,7 @@ func index(w http.ResponseWriter, r *http.Request) {
 	t.Execute(w, conf)
 }
 
+//action page
 func action(w http.ResponseWriter, r *http.Request, a Action) {
 	fmt.Fprint(w, cmd(a.Path))
 }
