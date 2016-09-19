@@ -58,7 +58,7 @@ func InitConf(path string) (err error) {
 			return fmt.Errorf("make hello: %v", err)
 		}
 		defer HelloSh.Close()
-		_, err = HelloSh.WriteString("echo hello")
+		_, err = HelloSh.WriteString("echo hello world!")
 		if err != nil {
 			return fmt.Errorf("write hello: %v", err)
 		}

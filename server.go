@@ -3,6 +3,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"net/http"
 	"os"
 	"os/exec"
@@ -10,7 +11,10 @@ import (
 	"strconv"
 )
 
+var conf Conf
+
 func Start(c Conf) {
+	conf = c
 	//start server
 	url := "http://localhost" + ":" + strconv.Itoa(c.Port)
 	fmt.Println("Stop: Ctrl+C")
@@ -32,7 +36,13 @@ func Start(c Conf) {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprint(w, "ふぇぇ")
+	t := template.New("index")
+	t, err := t.Parse(templete_index)
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+	}
+
+	t.Execute(w, conf)
 }
 
 func action(w http.ResponseWriter, r *http.Request, a Action) {
