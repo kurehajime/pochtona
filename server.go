@@ -43,7 +43,6 @@ func index(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}
-
 	t.Execute(w, conf)
 }
 

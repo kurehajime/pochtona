@@ -96,6 +96,13 @@ func GetSampleConf(out io.Writer, path string) error {
 //ReadConf read config
 func ReadConf(path string) (Conf, error) {
 	var c Conf
+	fInfo, err := os.Stat(path)
+	if err != nil {
+		return c, fmt.Errorf("read conf: %v", err)
+	}
+	if fInfo.IsDir() == true {
+		path += "/pochtona.json"
+	}
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
 		return c, fmt.Errorf("read conf: %v", err)
