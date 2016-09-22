@@ -9,7 +9,7 @@ import (
 
 func TestIndex(t *testing.T) {
 	temp := template.New("index")
-	temp, err := temp.Parse(templete_index)
+	temp, err := temp.Parse(assets["index.html"])
 	if err != nil {
 		t.Error("template parse error:", err)
 	}
