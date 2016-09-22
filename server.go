@@ -39,7 +39,7 @@ func Start(c Conf) {
 //index page
 func index(w http.ResponseWriter, r *http.Request) {
 	t := template.New("index")
-	t, err := t.Parse(assets["index.html"])
+	t, err := t.Parse(assets["_assets/index.html"])
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 	}

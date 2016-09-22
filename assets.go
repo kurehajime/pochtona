@@ -4,7 +4,7 @@ package main
 var assets = map[string]string{}
 
 func init() {
-	assets["index.html"] = `
+	assets["_assets/index.html"] = `
 <html>
 <body>
 	{{range .Actions}}

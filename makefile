@@ -1,13 +1,13 @@
-ASSETS =index.html
+#  make assets.go by _assets/*
 assets.go:_assets/*
-	echo "//assets.go" > assets.go
-	echo "package main" >> assets.go
-	echo "var assets = map[string]string{}" >> assets.go
-	echo "func init(){" >> assets.go
-	for file in $(ASSETS) ; do \
-	    echo "assets[\"$$file\"]= \`">> assets.go ; \
-	    cat ./_assets/$$file >> assets.go ; \
-	    echo "\`">> assets.go ; \
+	echo "//assets.go" > $@
+	echo "package main" >> $@
+	echo "var assets = map[string]string{}" >> $@
+	echo "func init(){" >> $@
+	for file in _assets/* ; do \
+	    echo "assets[\"$$file\"]= \`">> $@ ; \
+	    cat $$file >> $@ ; \
+	    echo "\`">> $@ ; \
 	done
-	echo "}" >> assets.go
-	gofmt -w assets.go
+	echo "}" >> $@
+	gofmt -w $@
