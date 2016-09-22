@@ -1,4 +1,4 @@
-ASSETS =index.html
+ASSETS =$(ls ./_assets)
 assets.go:_assets/*
 	echo "//assets.go" > assets.go
 	echo "package main" >> assets.go
