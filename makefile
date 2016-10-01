@@ -11,3 +11,9 @@ assets.go:_assets/*
 	done
 	echo "}" >> $@
 	gofmt -w $@
+	
+out:
+	go test
+	rm -rf ./bin
+	gox -output "bin/{{.OS}}_{{.Arch}}/{{.Dir}}" ./...
+	-find ./bin \! -name "*.zip" -type d -exec zip -r -j {}.zip {} \; -exec rm -R -d {} \;
