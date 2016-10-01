@@ -24,3 +24,22 @@ func TestCmd(t *testing.T) {
 		return
 	}
 }
+func TestCheckIP(t *testing.T) {
+	tests := []struct {
+		addr             string
+		allowIpAddresses []string
+		assert           bool
+	}{
+		{"192.168.1.1", []string{"192.168.1.1"}, true},
+		{"192.168.1.2", []string{"192.168.1.1"}, false},
+		{"192.168.1.42", []string{"192.168.1.*"}, true},
+		{"192.168.42.1", []string{"192.168.1.*"}, false},
+		{"192.168.42.1", []string{"192.168.*.1"}, true},
+	}
+	for i := range tests {
+		if checkIP(tests[i].addr, tests[i].allowIpAddresses) != tests[i].assert {
+			t.Fatal("failed to IP Check: %s ,%s assert :%s", tests[i].addr, tests[i].allowIpAddresses, tests[i].assert)
+		}
+	}
+
+}

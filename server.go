@@ -4,11 +4,14 @@ package main
 import (
 	"fmt"
 	"html/template"
+	"net"
 	"net/http"
 	"os"
 	"os/exec"
+	"regexp"
 	"runtime"
 	"strconv"
+	"strings"
 )
 
 var conf Conf
@@ -29,7 +32,13 @@ func Start(c Conf) {
 		})
 	}
 	//listen
-	err := http.ListenAndServe(":"+strconv.Itoa(c.Port), nil)
+	server := &http.Server{}
+	l, err := net.Listen("tcp4", ":"+strconv.Itoa(c.Port))
+	if err != nil {
+		fmt.Fprintln(os.Stderr, err.Error())
+		os.Exit(1)
+	}
+	err = server.Serve(l)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, err.Error())
 		os.Exit(1)
@@ -38,6 +47,11 @@ func Start(c Conf) {
 
 //index page
 func index(w http.ResponseWriter, r *http.Request) {
+	if checkIP(r.RemoteAddr, conf.AllowIpAddresses) == false {
+		w.WriteHeader(403)
+		w.Write([]byte("403 Forbidden\n"))
+		return
+	}
 	t := template.New("index")
 	t, err := t.Parse(assets["_assets/index.html"])
 	if err != nil {
@@ -48,6 +62,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 
 //action page
 func action(w http.ResponseWriter, r *http.Request, a Action) {
+	if checkIP(r.RemoteAddr, conf.AllowIpAddresses) == false {
+		w.WriteHeader(403)
+		w.Write([]byte("403 Forbidden\n"))
+		return
+	}
 	fmt.Fprint(w, cmd(a.Path))
 }
 
@@ -67,4 +86,20 @@ func cmd(commandString string) string {
 		return string(err.Error())
 	}
 	return string(out)
+}
+
+//checkIP
+func checkIP(addr string, allowIpAddresses []string) bool {
+	addr = strings.Split(addr, ":")[0]
+	re1 := regexp.MustCompile("\\.")
+	re2 := regexp.MustCompile("\\*")
+	for i := range allowIpAddresses {
+		rule := allowIpAddresses[i]
+		rule = re1.ReplaceAllString(rule, "\\.")
+		rule = re2.ReplaceAllString(rule, ".*")
+		if regexp.MustCompile(rule).Match([]byte(addr)) == true {
+			return true
+		}
+	}
+	return false
 }
