@@ -1,0 +1,13 @@
+{
+    "allow_ip_addresses": [
+        "*.*.*.*"
+    ],
+    "port": 8080,
+    "actions": [
+        {
+            "id": "hello",
+            "path": "/Users/gabill/Documents/GO/src/github.com/kurehajime/pochtona/hello.sh",
+            "description": "echo hello"
+        }
+    ]
+}

@@ -75,13 +75,19 @@ func InitConf(path string) (err error) {
 
 //GetSampleConf writes sample config
 func GetSampleConf(out io.Writer, path string) error {
+	var hello string
+	if runtime.GOOS != "windows" {
+		hello = "hello.sh"
+	} else {
+		hello = "hello.bat"
+	}
 	sampleConf := Conf{
 		AllowIpAddresses: []string{"*.*.*.*"},
 		Port:             8080,
 		Actions: []Action{
 			Action{
 				Id:          "hello",
-				Path:        filepath.Join(path, "hello.sh"),
+				Path:        filepath.Join(path, hello),
 				Description: "echo hello",
 			},
 		}}
