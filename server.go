@@ -67,7 +67,7 @@ func action(w http.ResponseWriter, r *http.Request, a Action) {
 		w.Write([]byte("403 Forbidden\n"))
 		return
 	}
-	fmt.Fprint(w, cmd("\""+a.Path+"\""))
+	fmt.Fprint(w, cmd(a.Path))
 }
 
 //exec command
